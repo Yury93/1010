@@ -1,7 +1,7 @@
 ﻿using UnityEngine; 
 
  
-    public interface IDragItemSprite : IDragSpriteHandler, IBeginDragSpriteHandler, IEndDragSpriteHandler, IUpdater
+    public interface IDragItemSprite  : IDragSpriteHandler, IBeginDragSpriteHandler, IEndDragSpriteHandler, IUpdater
     {
         public Transform MyTransform { get; }
         public Transform FreeContent { get; }
@@ -20,17 +20,17 @@
 
     public interface IEndDragSpriteHandler
     {
-        public void OnEndDrag(Transform transform);
+        public void OnEndDrag<T>(EventData2D<T> transform);
     }
 
     public interface IDragSpriteHandler
     {
-        public void OnDrag(Transform transform);
+        public void OnDrag<T>(EventData2D<T> transform);
     }
 
     public interface IBeginDragSpriteHandler
     {
-        public void OnBeginDrag(Transform transform);
+        public void OnBeginDrag<T>(EventData2D<T> transform);
  
     }
 

@@ -1,20 +1,18 @@
 using UnityEngine;
 
 public class CellItem : DragItemSprite
-{
-
-
-    public override void OnBeginDrag(Transform transform)
+{ 
+    public override void OnBeginDrag<T>(EventData2D<T> eventData)
     {
-        base.OnBeginDrag(transform);
+        base.OnBeginDrag<T>(eventData);
     }
-    public override void OnDrag(Transform transform)
+    public override void OnDrag<T>(EventData2D<T> eventData)
     {
-        base.OnDrag(transform);
+        base.OnDrag(eventData);
     }
-    public override void OnEndDrag(Transform transform)
+    public override void OnEndDrag<T>(EventData2D<T> eventData)
     {
-        base.OnEndDrag(transform);
+        base.OnEndDrag(eventData);
     }
     public override void Updated()
     {
