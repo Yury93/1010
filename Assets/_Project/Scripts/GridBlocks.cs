@@ -1,14 +1,23 @@
 using System.Collections.Generic;
-using UnityEngine; 
-
+using System.Linq;
+using UnityEngine;
+[SerializeField]
+public class ItemCellEntity
+{
+    public int line;
+    public int collumn;
+}
 public class GridBlocks : MonoBehaviour
-{ 
+{
+    
     [SerializeField] private Cell prefabGrid;
     [SerializeField] private List<LinePosition> linePositions;
     [SerializeField] private float space;
     [SerializeField] private Transform content;
-    private List<Cell> cells = new List<Cell>();
-    private void Start()
+    public List<Cell> cells = new List<Cell>();
+    public List<Cell> FreeCells => cells.Where(c=>c.DragItems.Count == 0).ToList();
+    public List<Cell> BanCells => cells.Where(c => c.DragItems.Count > 0).ToList();
+    public void Init()
     {
         cells.ForEach(s => Destroy(s.gameObject));
         cells.Clear();

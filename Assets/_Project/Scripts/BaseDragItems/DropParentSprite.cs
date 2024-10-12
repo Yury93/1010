@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.EventSystems;
  
     public class DropParentSprite : MonoBehaviour, IDropParentSprite
     {
@@ -19,12 +18,13 @@ using UnityEngine.EventSystems;
                 var dragItem = data .GetComponent<IDragItemSprite>();
                 AddDragItem(dragItem);
             }
-        Debug.LogError("on drop");
         }
         public virtual void AddDragItem(IDragItemSprite dragItem)
         {
           if (dragItem.Parent != null) dragItem.Parent.RemoveFromListItem(dragItem);
             dragItem.SetDropParent(this);
+    var dragItemSprite =    dragItem as DragItemSprite;
+        dragItemSprite.SetupParentPosition();
             if (dragItems.Contains(dragItem) == false)
                 dragItems.Add(dragItem);
         }

@@ -4,11 +4,24 @@ using UnityEngine;
 
 public class GameController : MonoBehaviour
 {
-    [SerializeField] private CellItem cellItem;
     public Transform freeContent;
+    public static GameController instance;
+    [field:SerializeField] public GridBlocks GridBlocks {  get; private set; }
+
+    [Space(20)] 
+    [SerializeField] private List<GroupItem> variantItems;
+    [SerializeField] private List<StartDropParent> startDropParents;
+ 
 
     private void Awake()
     {
-        cellItem.SetFreeContent(freeContent);
+        instance = this;
+        GridBlocks.Init();
+       
+        //groupItem.Init();
+        //groupItem.SetDropParent(generalDropParent);
+        //groupItem.SetupParentPosition();
+        //groupItem.SetFreeContent(freeContent);
+
     }
 }
