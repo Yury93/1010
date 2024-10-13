@@ -1,15 +1,10 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-[SerializeField]
-public class ItemCellEntity
-{
-    public int line;
-    public int collumn;
-}
+ 
 public class GridBlocks : MonoBehaviour
 {
-    
     [SerializeField] private Cell prefabGrid;
     [SerializeField] private List<LinePosition> linePositions;
     [SerializeField] private float space;
@@ -17,6 +12,7 @@ public class GridBlocks : MonoBehaviour
     public List<Cell> cells = new List<Cell>();
     public List<Cell> FreeCells => cells.Where(c=>c.DragItems.Count == 0).ToList();
     public List<Cell> BanCells => cells.Where(c => c.DragItems.Count > 0).ToList();
+    public Action<Cell> onAddDragItem;
     public void Init()
     {
         cells.ForEach(s => Destroy(s.gameObject));
@@ -43,13 +39,12 @@ public class GridBlocks : MonoBehaviour
             item.line = lineIterator;
             lineIterator++;
         }
-
         CreateCells();
     }
 
     private void CreateCells()
     {
-        int lineNumber = 0;
+        int lineNumber = 9;
         foreach (var line in linePositions)
         {
             foreach (var pos in line.positions)
@@ -57,16 +52,23 @@ public class GridBlocks : MonoBehaviour
                 var cell = CreateCell(pos.position, pos.number);
                 cells.Add(cell);
                 cell.line = lineNumber;
-                cell.number = pos.number;
+                cell.column = pos.number;
+                cell.onAddDragItem += OnAddDragItem;
             }
-            lineNumber++;
+            lineNumber--;
         }
+        linePositions = linePositions.OrderByDescending(l => linePositions.IndexOf(l) ).ToList();
+    }
+
+    private void OnAddDragItem(Cell cell)
+    {
+       onAddDragItem?.Invoke(cell);
     }
 
     public Cell CreateCell(Vector2 position, int number)
     {
         var cell = Instantiate(prefabGrid, position, Quaternion.identity,content);
-        cell.number = number;
+        cell.column = number;
         return cell;
     }
 }

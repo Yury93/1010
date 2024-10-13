@@ -17,7 +17,7 @@ public class DragItemSprite : MonoBehaviour, IDragItemSprite
     public void SetFreeContent(Transform freeContent) => this.freeContent = freeContent;
 
      
-    public void SetupParentPosition()
+    public virtual void SetupParentPosition()
     { 
         MyTransform.SetParent(parent.MyTransform);
         transform.localPosition = Vector3.zero;

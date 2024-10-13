@@ -13,7 +13,7 @@ using UnityEngine;
         /// <param name="data"></param>
         public void OnDrop(Transform data)
         {
-            if (data  != null)
+            if (data  != null && dragItems.Count == 0)
             {
                 var dragItem = data .GetComponent<IDragItemSprite>();
                 AddDragItem(dragItem);
