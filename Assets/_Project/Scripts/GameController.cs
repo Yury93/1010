@@ -1,34 +1,47 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GameController : MonoBehaviour
 {
     public Transform freeContent;
     public static GameController instance;
     [field:SerializeField] public GridBlocks GridBlocks {  get; private set; }
-
     [Space(20)] 
     [SerializeField] private List<GroupItem> variantItems;
     [SerializeField] private List<float> variantRotations;
     [SerializeField] private List<StartDropParent> startDropParents;
     [SerializeField] private List<StartDropParent> bounds;
+    [SerializeField] private UIController uiController;
     private List<GroupItem> groupItems = new List<GroupItem>();
     int dropGoupCount;
-    
+    public bool IsStartGame { get;set;}
+    public Action onStart;
+    public Action onEnd;
     private void Awake()
     {
         instance = this;
         GridBlocks.Init();
+        uiController.Init();
+ 
     }
-    private void Start()
+    private IEnumerator Start()
     {
+        while (IsStartGame == false) 
+        { 
+          yield return null;
+        }
+  
+        onStart?.Invoke();
         CreateVariantBlocks();
         CreateBounds();
         GridBlocks.onAddDragItem += OnAddDragItem;
     }
-
+      
     private void OnAddDragItem(Cell cell)
     {
         var lineCells = GridBlocks.cells.Where(c => c.line == cell.line).ToList();
@@ -63,9 +76,9 @@ public class GameController : MonoBehaviour
     {  
         foreach (var parent in startDropParents)
         {
-            var rnd = Random.Range(0, variantItems.Count);
+            var rnd =UnityEngine. Random.Range(0, variantItems.Count);
             var dragItem = Instantiate(variantItems[rnd], null);
-            var rndRotation = Random.Range(0, variantRotations.Count);
+            var rndRotation = UnityEngine.Random.Range(0, variantRotations.Count);
              dragItem.transform.rotation = Quaternion.Euler(new Vector3(0, 0, variantRotations[rndRotation]));
             dragItem.Rotation = variantRotations[rndRotation];
             dragItem.Init();
@@ -173,9 +186,12 @@ public class GameController : MonoBehaviour
         if (!canPlace)
         { 
             Debug.LogError("Нет места");
+            onEnd?.Invoke();
         }
 
     }
+
+   
 
     private void CreateBounds()
     {
