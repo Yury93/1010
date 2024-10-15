@@ -1,3 +1,4 @@
+using DG.Tweening;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -53,9 +54,10 @@ public class GameController : MonoBehaviour
         {
             foreach (var item in lineCells)
             {
-               var dragItem = item.DragItems[0];
+                var dragItem = item.DragItems[0];
                 item.RemoveFromListItem(dragItem);
-                Destroy(dragItem.MyTransform.gameObject);
+                DestroyItem(dragItem);
+
             }
         }
         if( isNumberFilled)
@@ -66,10 +68,20 @@ public class GameController : MonoBehaviour
                 {
                     var dragItem = item.DragItems[0];
                     item.RemoveFromListItem(dragItem);
-                    Destroy(dragItem.MyTransform.gameObject);
+                    DestroyItem(dragItem);
                 }
             }
         }
+    }
+
+    private static void DestroyItem(IDragItemSprite dragItem)
+    {
+        var cellItem = dragItem.MyTransform.GetComponent<CellItem>();
+        cellItem.SpriteRender.transform.DOScale(new Vector3(0, 0, 0), 0.7f);
+        cellItem.SpriteRender.transform.DOLocalRotate(new Vector3(0, 0, -180), 1.2f).OnComplete(() =>
+        {
+            Destroy(dragItem.MyTransform.gameObject);
+        });
     }
 
     private void CreateVariantBlocks()
