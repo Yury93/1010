@@ -15,8 +15,9 @@ public class GroupItem : DragItemSprite
     [field: SerializeField] public List<Lines> ShapeLines90 { get; set; }  
     [field: SerializeField] public bool isFliped { get; set; }
     public Action<GroupItem,List<CellItem>> onDrop;
+    public List<CellItem> CellItems => cellItem;
     public float Rotation { get; set; }
-
+    List<Tween> tweens = new List<Tween>();
     public void Init()
     {
         cellItem.ForEach(c=>c.SetGroup(this));
@@ -44,6 +45,8 @@ public class GroupItem : DragItemSprite
     {
         if (Input.GetMouseButtonUp(0))
         {
+         //   tweens.ForEach(t=>t?.Kill());
+          //  SetNormalScale();
             bool allColliders = IsAllColliders();
             if ((allColliders == false))
             {
@@ -65,13 +68,13 @@ public class GroupItem : DragItemSprite
     public void SetSmallScale()
     {
         
-            transform.DOScale(new Vector3(transform.localScale.x/1.1f, transform.localScale.y / 1.1f, 1f),0.2f);
+          tweens.Add(  transform.DOScale(new Vector3(transform.localScale.x/1.1f, transform.localScale.y / 1.1f, 1f),0.001f));
        
     }
     public void SetNormalScale()
     {
-       
-             transform.DOScale(new Vector3(3f, 3f, 3f), 0.2f);
+
+        tweens.Add(transform.DOScale(new Vector3(3f, 3f, 3f), 0.001f));
         
     }
     private void DropItems()
@@ -79,6 +82,7 @@ public class GroupItem : DragItemSprite
         for (int i = 0; i < cellItem.Count; i++)
         {
             cellItem[i].DropParentSprite.OnDrop(cellItem[i].transform);
+         //   cellItem[i].transform.localScale = Vector3.one;
         }
         onDrop?.Invoke(this,cellItem);
     }

@@ -10,23 +10,55 @@ public class UIController : MonoBehaviour
 {
     [SerializeField] private Button startButton;
     [SerializeField] private TextMeshProUGUI tapToStartText, gameoverText;
+    [SerializeField] private TextMeshProUGUI scoreText,scoreText2, recordText,recordText2;
     [SerializeField] private Image fade;
     [SerializeField] private float animationDuration ;
-    [SerializeField] private Color[] colors;
+    [SerializeField] private GameClose gameClose;
     public string GAME_OVER = "GAME OVER";
     public string TAP_TO_START = "TAP TO START";
+ 
+   // public string RECORD = "RECORDPREFS";
+  
+    int score, record;  
     public void Init()
     {
+        GameController.instance.onAddScore += AddScore;
         GameController.instance.onStart += OnStart;
         startButton.onClick.AddListener(() => GameController.instance.IsStartGame = true);
         GameController.instance.onEnd += OnEndGame;
         StartCoroutine(AnimateTextCoroutine(TAP_TO_START, tapToStartText));
         gameoverText.gameObject.SetActive(false);
-
-
-
-     
+        recordText.gameObject.SetActive(false);
+        recordText2.gameObject.SetActive(false);
+      //  var recordstr = Jammer.PlayerPrefs.GetString(RECORD);
+      //  if (string.IsNullOrEmpty(recordstr) == false) record = Int32.Parse(recordstr);
+      // ShowRecord();
     }
+
+    private void ShowRecord()
+    {
+        recordText.text = record.ToString();
+        recordText2.text = record.ToString();
+    }
+    public void AddScore(int score)
+    {
+        this.score+= score;
+        if(this.score > record)
+        {
+            record = this.score;
+          //  Jammer.PlayerPrefs.SetString(RECORD,record.ToString());
+           // ShowRecord();
+        }
+        ShowScore();
+        gameClose.CallAddScore(score);
+    }
+
+    private void ShowScore()
+    {
+        scoreText.text = score.ToString();
+        scoreText2.text = score.ToString();
+    }
+
     private void OnStart()
     {
         fade.gameObject.SetActive(false);
@@ -34,12 +66,20 @@ public class UIController : MonoBehaviour
     }
     private void OnEndGame()
     {
+        ShowScore();
+      //  ShowRecord();
         startButton.onClick.RemoveAllListeners();
         fade.gameObject.SetActive(true);
         gameoverText.gameObject.SetActive(true);
         StartCoroutine(AnimateTextCoroutine(GAME_OVER, gameoverText));
-        //startButton.onClick.AddListener(CloseGame);
+        startButton.onClick.AddListener(CloseGame);
         //StartCoroutine(AnimateTextCoroutine());
+    }
+
+    public void CloseGame()
+    {
+        Debug.Log("game over");
+        gameClose.CloseCurrentFrame();
     }
 
     IEnumerator AnimateTextCoroutine(string text,TextMeshProUGUI textMeshProUGUI)

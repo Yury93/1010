@@ -1,4 +1,5 @@
 using DG.Tweening;
+using SpriteShadersUltimate;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -9,6 +10,45 @@ using UnityEngine.UI;
 
 public class GameController : MonoBehaviour
 {
+    [Serializable]
+    public class TakeRewardButton 
+    {
+        [SerializeField] private SpriteRenderer sprite;
+        [SerializeField] private Button button;
+        [SerializeField] private ShaderFaderSSU faderSSU;
+        [SerializeField]  private TextMeshProUGUI text;
+        private GameController gameController;
+        private Color color;
+       public void Init(GameController gameController)
+        {
+            this.gameController = gameController;
+            color = sprite.color;
+            sprite.color = Color.clear;
+            text.color = Color.clear;
+            gameController.onAddScore += OnAddScore;
+        }
+
+        private void OnAddScore(int obj)
+        {
+            gameController.onAddScore -= OnAddScore;
+            gameController.StartCoroutine(CorShow());
+        }
+
+        public IEnumerator CorShow()
+        {
+            sprite.color = color;
+            faderSSU.isFaded = true;
+            yield return new WaitForSecondsRealtime(1.5f);
+            text.DOColor(Color.white, 1f);
+            sprite.transform.DOShakeScale(1f, 1, 1).OnComplete(()=> { sprite.transform.DOScale(Vector3.one *2, 0.1f); });
+            button.onClick.AddListener(Close); 
+        }
+
+        private void Close()
+        {
+            gameController.uiController.CloseGame();
+        }
+    }
     public Transform freeContent;
     public static GameController instance;
     [field:SerializeField] public GridBlocks GridBlocks {  get; private set; }
@@ -18,20 +58,25 @@ public class GameController : MonoBehaviour
     [SerializeField] private List<StartDropParent> startDropParents;
     [SerializeField] private List<StartDropParent> bounds;
     [SerializeField] private UIController uiController;
+    [SerializeField] private TakeRewardButton takeRewardButton;
+     
     private List<GroupItem> groupItems = new List<GroupItem>();
     int dropGoupCount;
     public bool IsStartGame { get;set;}
     public Action onStart;
     public Action onEnd;
+    public Action<int> onAddScore;
     private void Awake()
     {
         instance = this;
         GridBlocks.Init();
         uiController.Init();
- 
+        takeRewardButton.Init(this);
+        
     }
     private IEnumerator Start()
     {
+      
         while (IsStartGame == false) 
         { 
           yield return null;
@@ -41,6 +86,7 @@ public class GameController : MonoBehaviour
         CreateVariantBlocks();
         CreateBounds();
         GridBlocks.onAddDragItem += OnAddDragItem;
+      
     }
       
     private void OnAddDragItem(Cell cell)
@@ -59,6 +105,7 @@ public class GameController : MonoBehaviour
                 DestroyItem(dragItem);
 
             }
+            onAddScore?.Invoke(10);
         }
         if( isNumberFilled)
         {
@@ -71,6 +118,7 @@ public class GameController : MonoBehaviour
                     DestroyItem(dragItem);
                 }
             }
+            onAddScore?.Invoke(10);
         }
     }
 
@@ -88,8 +136,10 @@ public class GameController : MonoBehaviour
     {  
         foreach (var parent in startDropParents)
         {
-            var rnd =UnityEngine. Random.Range(0, variantItems.Count);
-            var dragItem = Instantiate(variantItems[rnd], null);
+            var rnd =GetMoreRandomInt(0, variantItems.Count);
+            rnd = Mathf.Clamp(rnd, 0, variantItems.Count -1);
+           // Debug.LogError($"{rnd} {variantItems.Count}");
+            var dragItem = Instantiate(variantItems[rnd], this.transform);
             var rndRotation = UnityEngine.Random.Range(0, variantRotations.Count);
              dragItem.transform.rotation = Quaternion.Euler(new Vector3(0, 0, variantRotations[rndRotation]));
             dragItem.Rotation = variantRotations[rndRotation];
@@ -103,7 +153,12 @@ public class GameController : MonoBehaviour
         }
       
     }
-
+    private int GetMoreRandomInt(int min, int max)
+    { 
+        System.Random systemRandom = new System.Random();
+        int randomOffset = systemRandom.Next(0, max - min);
+        return UnityEngine.Random.Range(min, max) + randomOffset;
+    }
     private bool CheckCanPlace(bool canPlace, GroupItem dragItem, int rotation)
     {
         foreach (var cell in GridBlocks.cells)
@@ -177,6 +232,7 @@ public class GameController : MonoBehaviour
 
     private void OnDropDragItem(GroupItem item, List<CellItem> list)
     {
+        onAddScore?.Invoke(item.CellItems.Count);
          dropGoupCount++;
         groupItems.Remove(item);
 
@@ -197,7 +253,7 @@ public class GameController : MonoBehaviour
         }
         if (!canPlace)
         { 
-            Debug.LogError("Нет места");
+           // Debug.LogError("Нет места");
             onEnd?.Invoke();
         }
 
