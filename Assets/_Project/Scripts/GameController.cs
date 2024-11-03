@@ -136,9 +136,10 @@ public class GameController : MonoBehaviour
     {  
         foreach (var parent in startDropParents)
         {
-            var rnd =GetMoreRandomInt(0, variantItems.Count);
-            rnd = Mathf.Clamp(rnd, 0, variantItems.Count -1);
-           // Debug.LogError($"{rnd} {variantItems.Count}");
+            //var rnd =GetMoreRandomInt(0, variantItems.Count);
+            //rnd = Mathf.Clamp(rnd, 0, variantItems.Count -1);
+            //Debug.LogError($"{rnd} {variantItems.Count}");
+            var rnd = UnityEngine.Random.Range(0, variantItems.Count);
             var dragItem = Instantiate(variantItems[rnd], this.transform);
             var rndRotation = UnityEngine.Random.Range(0, variantRotations.Count);
              dragItem.transform.rotation = Quaternion.Euler(new Vector3(0, 0, variantRotations[rndRotation]));
