@@ -46,7 +46,7 @@ public class GameController : MonoBehaviour
 
         private void Close()
         {
-            gameController.uiController.CloseGame();
+            gameController.uiController.OpenPopupClose();
         }
     }
     public Transform freeContent;

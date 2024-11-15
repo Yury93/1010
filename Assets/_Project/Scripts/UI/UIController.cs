@@ -14,6 +14,7 @@ public class UIController : MonoBehaviour
     [SerializeField] private Image fade;
     [SerializeField] private float animationDuration ;
     [SerializeField] private GameClose gameClose;
+    [SerializeField ] private PopupClose popupClose;
     public string GAME_OVER = "GAME OVER";
     public string TAP_TO_START = "TAP TO START";
  
@@ -30,11 +31,15 @@ public class UIController : MonoBehaviour
         gameoverText.gameObject.SetActive(false);
         recordText.gameObject.SetActive(false);
         recordText2.gameObject.SetActive(false);
+        popupClose.Init(this);
       //  var recordstr = Jammer.PlayerPrefs.GetString(RECORD);
       //  if (string.IsNullOrEmpty(recordstr) == false) record = Int32.Parse(recordstr);
       // ShowRecord();
     }
-
+    public void OpenPopupClose()
+    {
+        popupClose.Open();
+    }
     private void ShowRecord()
     {
         recordText.text = record.ToString();
@@ -50,7 +55,7 @@ public class UIController : MonoBehaviour
            // ShowRecord();
         }
         ShowScore();
-        gameClose.CallAddScore(score);
+        gameClose.CallAddScore(this. score);
     }
 
     private void ShowScore()
